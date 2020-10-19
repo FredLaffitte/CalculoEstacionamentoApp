@@ -1,0 +1,47 @@
+﻿@using  System.Globalization;
+@page "/"
+
+<style type="text/css">
+    .style1 {
+        font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+    }
+</style>
+
+<h1 class="style1">Calcula Taxa de Estacionamento</h1>
+
+
+<FormularioCalculaEstacionamento Estacionamento="@estacionamento" OnValidSubmit="@CalculaTaxa" ButtonTextSubmit="Calcular" ButtonTextCancelar="Cancelar">
+</FormularioCalculaEstacionamento>
+
+<br />
+<br />
+<br />
+
+<h1 class="style1">@Resultado</h1>
+
+
+@code{
+
+    Estacionamento estacionamento = new Estacionamento();
+
+    public string Resultado { get; set; }
+
+    async Task CalculaTaxa()
+    {
+        DateTime dt;
+        DateTime dt2;
+        DateTime.TryParseExact(estacionamento.horaEntrada, "HH:mm", null, System.Globalization.DateTimeStyles.None, out dt);
+        DateTime.TryParseExact(estacionamento.horaSaida, "HH:mm", null, System.Globalization.DateTimeStyles.None, out dt2);
+        TimeSpan diff = dt2 - dt;
+
+        if (diff.TotalHours < 1)
+        {
+            Resultado = $"Você deve pagar {(estacionamento.taxaInicial + estacionamento.taxaPrimeiraHora).ToString("C2", CultureInfo.CurrentCulture)}";
+        }
+        else
+        {
+            Resultado = $"Você deve pagar {((estacionamento.taxaInicial + estacionamento.taxaPrimeiraHora) + (estacionamento.taxaHoraAdicional * diff.TotalHours)).ToString("C2", CultureInfo.CurrentCulture)}";
+        }
+    }
+
+}
